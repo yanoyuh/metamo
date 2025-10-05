@@ -1,13 +1,48 @@
 {
   "name": "metamo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI画像編集Webアプリケーション",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "dev:full": "supabase start && vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force",
+    "storage:reset": "tsx scripts/storage-reset.ts",
+    "logs:reset": "tsx scripts/logs-reset.ts",
+    "data:reset": "pnpm run db:reset && pnpm run storage:reset && pnpm run logs:reset"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@ai-sdk/anthropic": "^1.0.0",
+    "@ai-sdk/google": "^1.0.0",
+    "@ai-sdk/openai": "^1.0.0",
+    "@prisma/client": "^6.0.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "@tanstack/react-router": "^1.80.0",
+    "ai": "^4.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tanstack/router-plugin": "^1.80.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.14",
+    "postcss": "^8.4.49",
+    "prisma": "^6.0.0",
+    "tailwindcss": "^3.4.15",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.1",
+    "vitest": "^2.1.8"
+  },
   "packageManager": "pnpm@10.17.1"
 }
