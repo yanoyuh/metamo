@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザー情報テーブル
+model User {
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String   @unique
+  name       String?
+  auth_id    String   @unique // Supabase Auth UUID
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user_plans              UserPlan[]
+  user_projects           UserProject[]
+  user_project_operations UserProjectOperation[]
+  user_usage_logs         UserUsageLog[]
+
+  @@map("users")
+}
+
+// プランマスタテーブル
+model Plan {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  max_storage Int // MB単位
+  max_ai_calls Int // 月あたりのAI呼び出し回数上限
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user_plans UserPlan[]
+
+  @@map("plans")
+}
+
+// ユーザープラン関連テーブル
+model UserPlan {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  plan_id    String   @db.Uuid
+  started_at DateTime @default(now())
+  ended_at   DateTime?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [plan_id], references: [id])
+
+  @@map("user_plans")
+}
+
+// ユーザープロジェクトテーブル
+model UserProject {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  name        String
+  description String?
+  thumbnail   String? // ストレージパス
+  storage_path String  // projects/{user_id}/{project_id}/ 形式
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user                    User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_project_operations UserProjectOperation[]
+
+  @@map("user_projects")
+}
+
+// ユーザープロジェクト操作履歴テーブル
+model UserProjectOperation {
+  id              String   @id @default(uuid()) @db.Uuid
+  user_id         String   @db.Uuid
+  user_project_id String   @db.Uuid
+  operation_type  String // e.g., "create", "edit", "ai_edit", "export"
+  prompt          String? // AI編集時のプロンプト
+  result_path     String? // 操作結果の画像パス
+  ai_model_id     String?  @db.Uuid
+  created_at      DateTime @default(now())
+
+  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_project UserProject @relation(fields: [user_project_id], references: [id], onDelete: Cascade)
+  ai_model     AiModel?    @relation(fields: [ai_model_id], references: [id])
+
+  @@map("user_project_operations")
+}
+
+// ユーザー利用ログテーブル
+model UserUsageLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  usage_type  String // e.g., "ai_call", "storage", "export"
+  usage_count Int      @default(1)
+  usage_size  Int? // MB単位（ストレージ利用時）
+  ai_model_id String?  @db.Uuid
+  created_at  DateTime @default(now())
+
+  user     User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  ai_model AiModel? @relation(fields: [ai_model_id], references: [id])
+
+  @@map("user_usage_logs")
+}
+
+// AIモデルマスタテーブル
+model AiModel {
+  id           String   @id @default(uuid()) @db.Uuid
+  provider     String // "google", "openai", "anthropic"
+  model_name   String   @unique // e.g., "gemini-2.0-flash-exp", "gpt-4o", "claude-3-5-sonnet-20241022"
+  display_name String
+  description  String?
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  user_project_operations UserProjectOperation[]
+  user_usage_logs         UserUsageLog[]
+
+  @@map("ai_models")
+}
