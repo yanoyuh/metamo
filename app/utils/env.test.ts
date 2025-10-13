@@ -52,9 +52,9 @@ describe('loadEnv', () => {
   it('should load optional API keys when provided', () => {
     ;(import.meta.env as any).VITE_SUPABASE_URL = 'http://localhost:54321'
     ;(import.meta.env as any).VITE_SUPABASE_ANON_KEY = 'test-anon-key'
-    ;(import.meta.env as any).GOOGLE_API_KEY = 'google-key'
-    ;(import.meta.env as any).OPENAI_API_KEY = 'openai-key'
-    ;(import.meta.env as any).ANTHROPIC_API_KEY = 'anthropic-key'
+    ;(import.meta.env as any).VITE_GOOGLE_AI_API_KEY = 'google-key'
+    ;(import.meta.env as any).VITE_OPENAI_API_KEY = 'openai-key'
+    ;(import.meta.env as any).VITE_ANTHROPIC_API_KEY = 'anthropic-key'
 
     const env = loadEnv()
 
