@@ -2,9 +2,6 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { supabase } from '@/utils/supabase'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { PlanService } from '@/services/PlanService'
-import { prisma } from '@/utils/prisma'
-import type { Plan } from '@prisma/client'
 
 export const Route = createFileRoute('/settings')({
   beforeLoad: async () => {
@@ -29,8 +26,8 @@ function SettingsPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  // Plan data
-  const [availablePlans, setAvailablePlans] = useState<Plan[]>([])
+  // Plan data (mock data for now)
+  const [availablePlans, setAvailablePlans] = useState<any[]>([])
   const [currentPlanData, setCurrentPlanData] = useState<any>(null)
   const [usageStats, setUsageStats] = useState({
     storageUsed: 0,
@@ -47,19 +44,26 @@ function SettingsPage() {
     if (!user) return
 
     try {
-      const planService = new PlanService(prisma)
+      // TODO: Implement API endpoint for plan data
+      // For now, use mock data
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-      // Load available plans
-      const plans = await planService.getAllPlans()
-      setAvailablePlans(plans)
+      const mockPlans = [
+        { id: '1', name: '無料プラン', price: 0, max_storage: 100, max_ai_calls: 10 },
+        { id: '2', name: 'プロプラン', price: 980, max_storage: 10000, max_ai_calls: 1000 },
+        { id: '3', name: 'ビジネスプラン', price: 2980, max_storage: 50000, max_ai_calls: 5000 },
+      ]
 
-      // Load current plan
-      const userPlan = await planService.getUserPlan(user.id)
-      setCurrentPlanData(userPlan)
-
-      // Load usage stats
-      const stats = await planService.getUsageStats(user.id)
-      setUsageStats(stats)
+      setAvailablePlans(mockPlans)
+      setCurrentPlanData({
+        plan: mockPlans[0],
+      })
+      setUsageStats({
+        storageUsed: 25,
+        aiCallsUsed: 3,
+        maxStorage: 100,
+        maxAiCalls: 10,
+      })
     } catch (error) {
       console.error('Failed to load plan data:', error)
     }
@@ -89,9 +93,9 @@ function SettingsPage() {
     setMessage('')
 
     try {
-      const planService = new PlanService(prisma)
-      await planService.changePlan(user.id, planId)
-      setMessage('プランを変更しました')
+      // TODO: Implement API endpoint for plan change
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setMessage('プランを変更しました（デモモード）')
       await loadPlanData()
     } catch (error: any) {
       setMessage(error.message || 'プラン変更に失敗しました')

@@ -27,33 +27,9 @@ function EditorPage() {
 
   const handleExport = async () => {
     try {
-      const storageService = new (await import('@/services/StorageService')).StorageService()
-      const aiService = new (await import('@/services/AIService')).AIService(
-        (await import('@/utils/prisma')).prisma,
-        (await import('@/utils/env')).env
-      )
-      const usageService = new (await import('@/services/UsageService')).UsageService(
-        (await import('@/utils/prisma')).prisma
-      )
-      const editorService = new (await import('@/services/EditorService')).EditorService(
-        (await import('@/utils/prisma')).prisma,
-        storageService,
-        aiService,
-        usageService
-      )
-
-      const imageData = await editorService.exportImage(userProjectId, 'png')
-
-      // Create download link
-      const blob = new Blob([imageData], { type: 'image/png' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `project-${userProjectId}.png`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      // TODO: Implement API endpoint for image export
+      // For now, show a message
+      alert('エクスポート機能は、バックエンドAPIの実装後に有効化されます。')
     } catch (error) {
       console.error('Failed to export image:', error)
       alert(`エクスポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)

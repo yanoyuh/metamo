@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import { useEditor } from '@/contexts/EditorContext'
 import { Route } from '@/routes/editor.$userProjectId'
-import { EditorService } from '@/services/EditorService'
-import { StorageService } from '@/services/StorageService'
-import { AIService } from '@/services/AIService'
-import { UsageService } from '@/services/UsageService'
-import { prisma } from '@/utils/prisma'
-import { env } from '@/utils/env'
 
 export function ChatPanel() {
   const { state, addChatMessage, setCurrentImage } = useEditor()
@@ -25,17 +19,6 @@ export function ChatPanel() {
     setProgress(0)
 
     try {
-      // Initialize services
-      const storageService = new StorageService()
-      const aiService = new AIService(prisma, env)
-      const usageService = new UsageService(prisma)
-      const editorService = new EditorService(
-        prisma,
-        storageService,
-        aiService,
-        usageService
-      )
-
       // Simulate progress updates
       const progressInterval = setInterval(() => {
         setProgress((prev) => Math.min(prev + 10, 90))
@@ -46,36 +29,17 @@ export function ChatPanel() {
         content: 'はい、承知いたしました。画像を編集しています...',
       })
 
-      // Get available AI models
-      const models = await aiService.getAvailableModels()
-      const defaultModel = models.find((m) => m.provider === 'google') || models[0]
-
-      // Apply editing instruction
-      const result = await editorService.applyEditing(
-        userProjectId,
-        userInstruction,
-        defaultModel.id,
-        state.selectedRegion || undefined,
-        state.clickPosition || undefined
-      )
+      // TODO: Implement API endpoint for AI editing
+      // For now, simulate the processing
+      await new Promise(resolve => setTimeout(resolve, 2000))
 
       clearInterval(progressInterval)
       setProgress(100)
 
       addChatMessage({
         role: 'ai',
-        content: `編集が完了しました。\n操作ID: ${result.operationId}\n編集内容: ${result.params.editType}`,
+        content: `編集を承りました。\n指示内容: ${userInstruction}\n\n※ 実際のAI編集機能は、バックエンドAPIの実装後に有効化されます。`,
       })
-
-      // Load the edited image
-      if (result.outputPath) {
-        // In a real implementation, we would load the image from the output path
-        // For now, we'll keep the current image as placeholder
-        addChatMessage({
-          role: 'ai',
-          content: '編集結果が保存されました。',
-        })
-      }
 
       setTimeout(() => {
         setIsProcessing(false)

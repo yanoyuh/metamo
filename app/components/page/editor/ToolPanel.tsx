@@ -1,34 +1,27 @@
 import { useState, useEffect } from 'react'
 import { Route } from '@/routes/editor.$userProjectId'
-import { EditorService } from '@/services/EditorService'
-import { StorageService } from '@/services/StorageService'
-import { AIService } from '@/services/AIService'
-import { UsageService } from '@/services/UsageService'
-import { prisma } from '@/utils/prisma'
-import { env } from '@/utils/env'
-import type { UserProjectOperation } from '@prisma/client'
 
 export function ToolPanel() {
   const { userProjectId } = Route.useParams()
   const [showHistoryModal, setShowHistoryModal] = useState(false)
-  const [operations, setOperations] = useState<UserProjectOperation[]>([])
+  const [operations, setOperations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   const loadOperations = async () => {
     setIsLoading(true)
     try {
-      const storageService = new StorageService()
-      const aiService = new AIService(prisma, env)
-      const usageService = new UsageService(prisma)
-      const editorService = new EditorService(
-        prisma,
-        storageService,
-        aiService,
-        usageService
-      )
-
-      const ops = await editorService.getOperations(userProjectId)
-      setOperations(ops)
+      // TODO: Implement API endpoint for loading operations
+      // For now, use mock data
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setOperations([
+        {
+          id: '1',
+          user_instruction: '画像を明るくする',
+          ai_model_id: 'gemini-1.5',
+          status: 'completed',
+          created_at: new Date(),
+        },
+      ])
     } catch (error) {
       console.error('Failed to load operations:', error)
     } finally {
@@ -45,25 +38,14 @@ export function ToolPanel() {
   const handleUndo = async () => {
     if (operations.length === 0) return
 
-    const lastOperation = operations[operations.length - 1]
-
     try {
-      const storageService = new StorageService()
-      const aiService = new AIService(prisma, env)
-      const usageService = new UsageService(prisma)
-      const editorService = new EditorService(
-        prisma,
-        storageService,
-        aiService,
-        usageService
-      )
-
-      await editorService.undoOperation(userProjectId, lastOperation.id)
+      // TODO: Implement API endpoint for undo
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       // Reload operations after undo
       await loadOperations()
 
-      alert('アンドゥが完了しました')
+      alert('アンドゥが完了しました（デモモード）')
     } catch (error) {
       console.error('Failed to undo operation:', error)
       alert(`アンドゥに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
